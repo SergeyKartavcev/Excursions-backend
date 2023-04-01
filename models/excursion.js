@@ -1,12 +1,11 @@
 const { Schema, model } = require("mongoose");
 
-const exrsionShema = Schema({
+const excursionShema = Schema({
   title: {
     type: String,
   },
-  img: { 
-  type: String,
-  default: "",
+  img: {
+    type: Object,
   },
   price: {
     type: String,
@@ -16,5 +15,5 @@ const exrsionShema = Schema({
   },
 });
 
-const Excursion = model("excursion", exrsionShema);
+const Excursion = model("excursion", excursionShema);
 module.exports = Excursion;

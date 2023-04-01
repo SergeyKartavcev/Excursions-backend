@@ -1,6 +1,4 @@
 const express = require("express");
-// const multer = require("multer");
-// const path = require("path");
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
 const cors = require("cors");

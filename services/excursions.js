@@ -1,9 +1,9 @@
 const { json } = require("express");
 const Excursion = require("../models/excursion");
 
-const createExcursion = async (title, img, price, description) => {
-  const excursion = { title, img: JSON.stringify(img), price, description };
-  return await Excursion.create(excursion);
+const createExcursion = async (title, description) => {
+  const excursionCard = { title, description };
+  return await Excursion.create(excursionCard);
 };
 
 const getExcursions = async (page = 1, limit = 6, search = "") => {
