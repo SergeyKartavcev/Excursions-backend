@@ -1,13 +1,13 @@
 const Video = require("../models/video");
 
 const getVideos = async (req, res, next) => {
-  const video = await Video.find({});
-  res.json(video);
+  const videos = await Video.find({});
+  res.json(videos);
 };
 
 const addVideo = async (req, res, next) => {
-  const { title, video, description } = req.body;
-  const result = await Video.create({ title, video, description });
+  const { title, link } = req.body;
+  const result = await Video.create({ title, link });
   res.status(201).json(result);
 };
 

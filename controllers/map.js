@@ -10,9 +10,19 @@ const getMap = async (req, res) => {
 };
 
 const addMap = async (req, res) => {
-  const {title, map }= req.body;
-  const result = await MapModel.create({title, map});
+  const {title, link, location, zoom }= req.body;
+  const result = await MapModel.create({title, link, location, zoom });
   res.status(201).json(result);
 };
 
-module.exports = { getMap, addMap };
+
+const deleteMap = async (req, res, next) => {
+  const { mapId } = req.params;
+  const result = await MapModel.deleteOne(mapId);
+  if (result.status) {
+    res.status(result.status).json({ message: result.message });
+  } else {
+    res.status(200).json(result);
+  }
+};
+module.exports = { getMap, addMap, deleteMap };

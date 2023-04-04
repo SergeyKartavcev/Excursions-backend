@@ -4,11 +4,8 @@ const videoShema = Schema({
   title: {
     type: String,
   },
-  video: { 
+  link: { 
   type: String,
-  },
-  description:{
-    type: String
   },
 });
 
