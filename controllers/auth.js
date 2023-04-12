@@ -1,39 +1,54 @@
-const { User } = require("../models/user");
+const { sentVerifyURL } = require("../services/verifycation");
 const { HttpError } = require("../helpers/helpers");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { User } = require("../models/user");
+const { Conflict, Unauthorized } = require("http-errors");
+const service = require("../services/users");
 const { JWT_SECRET } = process.env;
+const { v4: uuidv4 } = require("uuid");
 
 async function register(req, res, next) {
-  const { email, password, name, city, phone } = req.body;
-  const salt = await bcrypt.genSalt();
-  const hashedPassword = await bcrypt.hash(password, salt);
+  const { name, email, password, verificationToken} = req.body;
 
   try {
+    const verificationToken = uuidv4();
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
     const adminUser = await User.findOne({ email: "kartavcev1987serg@gmail.com", role: "admin" });
+    let result;
     if (adminUser && req.body.role === "admin") {
       return res.status(403).json({ message: "Only the owner of this account can assign the admin role" });
     } else if (adminUser) {
-      newUser = await User.create({
+      result = await User.create({
+        name,
         email,
         password: hashedPassword,
-        name,
-        city,
-        phone,
+        verificationToken,
         role: "user",
       });
     } else {
-      newUser = await User.create({
+      result = await User.create({
+        name,
         email,
         password: hashedPassword,
-        name,
-        city,
-        phone,
+        verificationToken,
         role: "admin",
       });
     }
-    res.status(201).json({ user: newUser });
-  
+
+    await result.save();
+    const verifyURL = `http://localhost:5000/auth/verify/${verificationToken}`;
+   
+    await sentVerifyURL(email, verifyURL);
+    res.status(201).json({
+      user: {
+        id: result._id,
+        email: result.email,
+        name: result.name,
+        role: result.role
+      },
+    });
   } catch (error) {
     if (error.message.includes("E11000 duplicate key error")) {
       throw new HttpError(409, "User with this email already exists");
@@ -43,28 +58,39 @@ async function register(req, res, next) {
   }
 }
 
+
+
+
 async function logIn(req, res, next) {
   const { email, password } = req.body;
-  const loginUser = await User.findOne({
-    email,
-  });
-  if (!loginUser) {
-    throw new HttpError(401, "email is not valid");
+
+  try {
+    const user = await service.getUserByEmail(email);
+    if (!user) {
+      throw Unauthorized("Email or password is wrong");
+    }
+    const passwordCompare = await bcrypt.compare(password, user.password);
+
+    if (!passwordCompare) {
+      throw Unauthorized(401, "Email or password is wrong");
+    }
+
+    const payload = { id: user._id };
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+    const result = await service.updateUser(user._id, { token });
+    res.json({
+      token: result.token,
+      user: {
+        _id: result._id,
+        name: result.name,
+        email: result.email,
+        role: result.role,
+      },
+    });
+  } catch (error) {
+    next(error);
   }
- 
-  const isPasswordValid = await bcrypt.compare(password, loginUser.password);
-  if (!isPasswordValid) {
-    throw new HttpError(401, "Email or password is wrong");
-  }
-  const token = jwt.sign({ id: loginUser._id }, JWT_SECRET, {
-    expiresIn: "1h",
-  });
-  return res.json({
-    data: {
-      token,
-    },
-  });
-}
+};
 
 async function logOut(req, res, next) {
   const { _id } = req.body;
@@ -72,63 +98,75 @@ async function logOut(req, res, next) {
   res.status(204).json();
 }
 
-async function refresh(req, res, next) {
-  const {name, email, subscription } = req.user;
-  const token = req.headers.authorization.split(' ')[1];
-  res.status(200).json({name, email, subscription, token});
+async function getCurrent(req, res, next) {
+  const {name, email, subscription, token, role } = req.user;
+  res.status(200).json({name, email, subscription, token, role});
 }
 
 
+const verifyToken = async (req, res, next) => {
+  const { verificationToken } = req.params;
+
+  try {
+    const user = await service.getUserByVerificationToken(verificationToken);
+    if (!user) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    await service.updateUser(user._id, { verify: true });
+    res.status(200).json({
+      message: "Verification successful",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 
-// async function verifyEmail(req, res, next) {
-//   const { token } = req.params;
-//   const user = await User.findOne({
-//     verifyToken: token,
-//   });
+const verifyEmail = async (req, res, next) => {
+  const { email } = req.body;
+  const {
+    protocol,
+    headers: { host },
+  } = req;
 
-//   if (!user) {
-//     throw BadRequest("Verify token is not valid!");
-//   }
+  try {
+    const user = await service.getUserByEmail(email);
 
-//   await User.findByIdAndUpdate(user._id, {
-//     verify: true,
-//     verifyToken: null,
-//   });
+    if (!user) {
+      return res.status(404).json({ message: "Not found" });
+    }
 
-//   return res.json({
-//     message: "Success",
-//   });
-// }
+    if (user.verify) {
+      return res.status(400).json({ message: "Verification has already been passed" });
+    }
 
-// async function resendVerify(req, res, next) {
-//   const { email } = req.body;
-//   const user = await User.findOne({email});
+    const verificationToken = uuidv4();
 
-//   if (!user) {
-//     throw BadRequest("missing required field email");
-//   }
-//   if(user.verify){
-//     throw BadRequest("Verification has already been passed");
-//   }
-//   await sendMail({
-//     to: email,
-//     subject: "please confirm your email",
-//     html: `<a href="localhost:3001/api/users/verify/${user.verifyToken}">confirm your email</a>`,
-//   });
+    await service.updateUser(user._id, {
+      verificationToken,
+    });
+
+    const verifyURL = `http://localhost:5000/auth/verify/${verificationToken}`;
+
+    await sentVerifyURL(email, verifyURL);
+
+    res.status(200).json({
+      message: "Verification email sent",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 
-//   return res.json({
-//     message: "Success",
-//   });
-// }
 
 module.exports = {
   register,
   logIn,
   logOut,
-  refresh,
-  // verifyEmail,
-  // resendVerify
+  getCurrent,
+  verifyEmail,
+  verifyToken
 };
 

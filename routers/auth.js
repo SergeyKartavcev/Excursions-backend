@@ -1,13 +1,15 @@
-const {register, logIn, logOut, refresh } = require("../controllers/auth");
+const {register, logIn, logOut, verifyToken, verifyEmail, getCurrent } = require("../controllers/auth");
 const { auth } = require("../middlewares/auth");
 const express = require("express");
-const { tryCatchWrapper } = require("../helpers/helpers");
+const { validateSchema } = require("../middlewares/validation");
+const { registerSchema, loginSchema } = require("../shemas/authShema");
 const router = express.Router();
 
 
-router.post("/register", tryCatchWrapper(register));
-router.post("/login", tryCatchWrapper(logIn));
-router.post("/logout", tryCatchWrapper(auth), tryCatchWrapper(logOut));
-router.get("/refresh", tryCatchWrapper(auth), tryCatchWrapper(refresh));
-
+router.post("/register", validateSchema(registerSchema), register);
+router.post("/login", validateSchema(loginSchema), logIn);
+router.get("/logout", auth, logOut);
+router.get("/current", auth , getCurrent);
+router.get("/verify/:verificationToken", verifyToken);
+router.post("/verify", verifyEmail);
 module.exports = router;

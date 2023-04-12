@@ -2,6 +2,10 @@ const { Schema, model } = require("mongoose");
 
 const userSchema = Schema(
   {
+    name: {
+      type: String,
+      required: [true, "Set name for user"],
+    },
     email: {
       type: String,
       required: [true, "Email is required"],
@@ -10,19 +14,7 @@ const userSchema = Schema(
     password: {
       type: String,
       required: [true, "Password is required"],
-    },
-    name: {
-      type: String,
-      required: [true, "Set name for user"],
-    },
-    city: {
-      type: String,
-      required: [true, "City is required"],
-    },
-    phone: {
-      type: String,
-      required: [true, "Phone is required"],
-    },
+    },  
     subscription: {
       type: String,
       enum: ["starter", "pro", "business"],
@@ -32,6 +24,15 @@ const userSchema = Schema(
       type: String,
       default: null,
     },
+    favorites: [{ type: Schema.Types.ObjectId, ref: "notice" }],
+    verificationToken: {
+      type: String,
+      required: [true, "Verify token is required"],
+    },
+    verify: {
+      type: Boolean,
+      default: false,
+    },
       role: {
       type: String,
       enum: ["admin", "user"],
@@ -40,6 +41,8 @@ const userSchema = Schema(
   },
   { versionKey: false, timestamps: true }
 );
+
+
 
 const User = model("user", userSchema);
 

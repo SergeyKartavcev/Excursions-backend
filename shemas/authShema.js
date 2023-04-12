@@ -1,21 +1,14 @@
-// const Joi = require("joi");
+const Joi = require("joi");
 
-// const registerSchema = Joi.object({
-//   password: Joi.string().min(7).max(32).required(),
-//   email: Joi.string().email().required(),
-//   name: Joi.string()
-//     .required(),
-//   city: Joi.string()
+const registerSchema = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(7).max(32).required(),
+});
 
-//     .required(),
-//   phone: Joi.string()
-//     .pattern(/^\+380\d{9}$/, "numbers")
-//     .required(),
-// });
+const loginSchema = Joi.object({
+  password: Joi.string().min(4).max(32).required(),
+  email: Joi.string().required(),
+});
 
-// const loginSchema = Joi.object({
-//   password: Joi.string().min(4).max(32).required(),
-//   email: Joi.string().required(),
-// });
-
-// module.exports = { registerSchema, loginSchema };
+module.exports = { registerSchema, loginSchema };

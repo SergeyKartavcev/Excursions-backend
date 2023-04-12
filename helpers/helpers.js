@@ -20,7 +20,7 @@ function tryCatchWrapper(enpointFn) {
 
   async function sendMail({ to, html, subject }) {
     const email = {
-      from: "info@mycontacts.com",
+      from: "kartavcev1987serg@gmail.com",
       to,
       subject,
       html,

@@ -6,8 +6,7 @@ const updateUserSchema = Joi.object({
     .min(2)
     .max(16),
   email: Joi.string().email(),
-  phone: Joi.string().pattern(/^\+380\d{9}$/, "numbers"),
-  city: Joi.string().pattern(/[A-Z][a-z]*/),
+
 });
 
 module.exports = { updateUserSchema };
