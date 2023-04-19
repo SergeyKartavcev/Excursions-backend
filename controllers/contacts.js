@@ -1,0 +1,58 @@
+const Contact = require("../models/contacts");
+
+// Создание контакта
+exports.createContact = async (req, res) => {
+  try {
+    const {
+      name,
+      address,
+      phoneNumbers,
+      viber,
+      telegram,
+      facebook,
+      instagram,
+    } = req.body;
+
+    const newContact = new Contact({
+      name,
+      address,
+      phoneNumbers,
+      viber,
+      telegram,
+      facebook,
+      instagram,
+    });
+
+    const savedContact = await newContact.save();
+
+    return res.status(201).json(savedContact);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Получение всех контактов
+exports.getAllContacts = async (req, res) => {
+  try {
+    const contacts = await Contact.find();
+    res.json(contacts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Удаление контакта по id
+exports.deleteContact = async (req, res) => {
+  try {
+    const contact = await Contact.findByIdAndDelete(req.params.id);
+    if (!contact) {
+      return res.status(404).json({ message: "Contact not found" });
+    }
+    res.json({ message: "Contact deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

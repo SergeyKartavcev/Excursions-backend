@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const excursionShema = Schema({
+const qvestShema = Schema({
   title: {
     type: String,
   },
@@ -28,5 +28,5 @@ const excursionShema = Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-const Excursion = model("excursion", excursionShema);
-module.exports = Excursion;
+const Qvest = model("qvest", qvestShema);
+module.exports = Qvest;
