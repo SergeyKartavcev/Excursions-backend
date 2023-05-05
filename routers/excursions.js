@@ -5,9 +5,9 @@ const {
 const { uploadCloud } = require("../middlewares/uploadMiddleware");
 
 routers.get("/", getExcursions);
-routers.get("/:id",getExcursion);
+routers.get("/:excursionId",getExcursion);
 routers.post("/", uploadCloud.single('img'), addExcursions);
-routers.delete("/:id", deleteExcursions);
+routers.delete("/:excursionId", deleteExcursions);
 
 
 module.exports = routers;

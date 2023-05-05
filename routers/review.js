@@ -4,6 +4,6 @@ const { createReview, getReviews, deleteReview } = require("../controllers/revie
 
 routers.get("/", getReviews);
 routers.post("/", createReview);
-routers.delete("/:id", deleteReview);
+routers.delete("/:reviewId", deleteReview);
 
 module.exports = routers;

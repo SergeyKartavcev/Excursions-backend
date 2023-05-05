@@ -15,6 +15,8 @@ const reviewRouter = require('./routers/review');
 const contactsRouter = require('./routers/сontacts');
 const qvestsRouter = require('./routers/qvest');
 const eventsRouter = require('./routers/events');
+const weRouter = require('./routers/we');
+const homeRouter = require('./routers/home');
 
 app.use(cors());
 app.use(express.json());
@@ -27,6 +29,8 @@ app.use('/review', reviewRouter);
 app.use('/contacts', contactsRouter);
 app.use('/qvests', qvestsRouter);
 app.use('/events', eventsRouter);
+app.use('/we', weRouter);
+app.use('/home', homeRouter);
 
 async function main() {
   try {

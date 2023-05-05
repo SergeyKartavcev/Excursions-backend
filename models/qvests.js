@@ -7,19 +7,16 @@ const qvestShema = Schema({
   img: {
     type: Object,
   },
-  route: {
+  whose: {
+    type: String,
+  },
+  location: {
     type: String,
   },
   description: {
     type: String,
   },
-  stops: {
-    type: String,
-  },
-  long: {
-    type: String,
-  },
-  time: {
+  bring: {
     type: String,
   },
   price: {

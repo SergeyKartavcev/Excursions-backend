@@ -5,9 +5,9 @@ const {
 const { uploadCloud } = require("../middlewares/uploadMiddleware");
 
 routers.get("/", getEvents);
-routers.get("/:id",getEvent);
+routers.get("/:eventId",getEvent);
 routers.post("/", uploadCloud.single('img'), addEvents);
-routers.delete("/:id", deleteEvents);
+routers.delete("/:eventId", deleteEvents);
 
 
 module.exports = routers;

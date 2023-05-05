@@ -1,26 +1,34 @@
 const Excursion = require("../models/excursion");
+const { HttpError } = require("../helpers/helpers");
+
+
 
 const getExcursions = async (req, res) => {
   const excursions = await Excursion.find({});
   res.json(excursions);
 };
 
-const getExcursion = async (req, res) => {
-  const excursionId = req.params.id;
-  Excursion.findById(excursionId)
-    .then((excursion) => {
-      res.json(excursion);
-    })
-    .catch((err) => {
-      res.status(500).json({ error: err.message });
-    });
-};
+
+
+async function getExcursion(req, res, next) {
+  const { excursionId } = req.params;
+  const excursion = await Excursion.findById(excursionId);
+
+  if (!excursion) {
+    return next(HttpError(404, "Not found"));
+  }
+  return res.status(200).json(excursion);
+}
+
+
 
 const addExcursions = async (req, res) => {
+  const { excursionId } = req.params;
   const { title, route, description, stops, long, time, price } = req.body;
   const img = req.file ? req.file.path : null;
 
   const result = await Excursion.create({
+    excursionId,
     title,
     img,
     route,
@@ -35,12 +43,13 @@ const addExcursions = async (req, res) => {
 
 const deleteExcursions = async (req, res) => {
   const { excursionId } = req.params;
-  const result = await Excursion.deleteOne(excursionId);
-  if (result.status) {
-    res.status(result.status).json({ message: result.message });
-  } else {
-    res.status(200).json(result);
+  const excursion = await Excursion.findById(excursionId);
+
+  if (!excursion) {
+    return next(HttpError(404, "Not found"));
   }
+ await Excursion.findByIdAndRemove(excursionId);
+  return res.status(200).json({ message: "Екскурсія видалена" });
 };
 
 

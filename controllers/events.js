@@ -5,22 +5,27 @@ const getEvents = async (req, res) => {
   res.json(events);
 };
 
-const getEvent = async (req, res) => {
-  const eventId = req.params.id;
-  Event.findById(eventId)
-    .then((event) => {
-      res.json(event);
-    })
-    .catch((err) => {
-      res.status(500).json({ error: err.message });
-    });
-};
+
+async function getEvent(req, res, next) {
+  const { eventId } = req.params;
+  const event = await Event.findById(eventId);
+
+  if (!event) {
+    return next(HttpError(404, "Not found"));
+  }
+  return res.status(200).json(event);
+}
+
+
+
 
 const addEvents = async (req, res) => {
+  const { eventId } = req.params;
   const { title, date, description, time, price } = req.body;
   const img = req.file ? req.file.path : null;
 
   const result = await Event.create({
+    eventId,
     title,
     img,
     description,
@@ -33,12 +38,11 @@ const addEvents = async (req, res) => {
 
 const deleteEvents = async (req, res) => {
   const { eventId } = req.params;
-  const result = await Event.deleteOne(eventId);
+  const result = await Event.findById(eventId);
   if (result.status) {
-    res.status(result.status).json({ message: result.message });
-  } else {
-    res.status(200).json(result);
-  }
+    return next(HttpError(404, "Not found"));
+  } await Event.findByIdAndRemove(eventId);
+  return res.status(200).json({ message: "подія видалена" });
 };
 
 

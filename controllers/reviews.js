@@ -1,10 +1,11 @@
 const Review = require('../models/review');
 
-// Создание отзыва
+
 const createReview = async (req, res) => {
   try {
+    const { reviewId } = req.params;
     const { author, rating, comment } = req.body;
-    const review = new Review({ author, rating, comment });
+    const review = new Review({ reviewId, author, rating, comment });
     await review.save();
     res.status(201).json(review);
   } catch (error) {
@@ -12,7 +13,7 @@ const createReview = async (req, res) => {
   }
 };
 
-// Получение всех отзывов
+
 const getReviews = async (req, res) => {
   try {
     const reviews = await Review.find();
@@ -22,14 +23,15 @@ const getReviews = async (req, res) => {
   }
 };
 
-// Удаление отзыва
+
 const deleteReview = async (req, res) => {
     try {
-      const { id } = req.params;
-      const review = await Review.findById(id);
-      if (!review) throw new Error('Отзыв не найден');
-      await review.deleteOne();
-      res.json({ message: 'Отзыв удален' });
+      const { reviewId } = req.params;
+      const result = await Review.findById(reviewId);
+      if (result.status) {
+        return next(HttpError(404, "Not found"));
+      } await Review.findByIdAndRemove(reviewId);
+      return res.status(200).json({ message: "відгук видалено" });
     } catch (error) {
       res.status(404).json({ message: error.message });
     }
