@@ -34,7 +34,7 @@ app.use('/home', homeRouter);
 
 async function main() {
   try {
-    mongoose.connect(HOST_URI);
+    await mongoose.connect(HOST_URI);
     console.log("Database connection successful");
     app.listen(PORT, () => {
       console.log(`server is listening on port ${PORT}` );
