@@ -15,7 +15,7 @@ const addHome = async (req, res) => {
   const { title, description  } = req.body;
   const img = req.file ? req.file.path : null;
  
-  const result = await Home.create({
+  const result = await Homey.create({
     homeId,
     img, 
     title,
