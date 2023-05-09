@@ -1,7 +1,5 @@
 const We = require("../models/we");
 
-
-
 const getWe = async (req, res) => {
     We.find()
     .then((we) => {

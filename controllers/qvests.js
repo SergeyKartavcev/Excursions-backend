@@ -32,7 +32,7 @@ const addQvests = async (req, res) => {
     bring,
     price,
   });
-  res.status(201).json(result); // возвращаем созданный объект экскурсии
+  res.status(201).json(result); 
 };
 
 
