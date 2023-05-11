@@ -1,6 +1,6 @@
 const Contact = require("../models/contacts");
 
-// Создание контакта
+
 exports.createContact = async (req, res) => {
   try {
     const {
@@ -32,7 +32,7 @@ exports.createContact = async (req, res) => {
   }
 };
 
-// Получение всех контактов
+
 exports.getAllContacts = async (req, res) => {
   try {
     const contacts = await Contact.find();
@@ -43,7 +43,7 @@ exports.getAllContacts = async (req, res) => {
   }
 };
 
-// Удаление контакта по id
+
 exports.deleteContact = async (req, res) => {
   try {
     const contact = await Contact.findByIdAndDelete(req.params.id);
