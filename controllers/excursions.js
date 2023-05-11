@@ -38,7 +38,7 @@ const addExcursions = async (req, res) => {
     time,
     price,
   });
-  res.status(201).json(result); // возвращаем созданный объект экскурсии
+  res.status(201).json(result); 
 };
 
 const deleteExcursions = async (req, res) => {
