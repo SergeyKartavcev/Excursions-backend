@@ -1,14 +1,10 @@
 const Excursion = require("../models/excursion");
 const { HttpError } = require("../helpers/helpers");
 
-
-
 const getExcursions = async (req, res) => {
   const excursions = await Excursion.find({});
   res.json(excursions);
 };
-
-
 
 async function getExcursion(req, res, next) {
   const { excursionId } = req.params;
